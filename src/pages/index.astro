@@ -1,0 +1,405 @@
+---
+import '../styles/global.css';
+import { chain, overviewStats, sites, zones } from '../data/sites';
+
+const zoneSiteCount = (zoneId: string) => sites.filter((site) => site.zone === zoneId).length;
+---
+
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="Micro Mundo de la Energía: una maqueta isométrica interactiva del Sistema Eléctrico Nacional de Chile. Explora la generación, transmisión y consumo de energía."
+    />
+    <meta name="theme-color" content="#072629" />
+    <meta property="og:title" content="Micro Mundo de la Energía · Chile" />
+    <meta
+      property="og:description"
+      content="Un Chile en miniatura, conectado por la energía. Explora en 3D la costa, el desierto, la cordillera y la red eléctrica nacional."
+    />
+    <meta property="og:type" content="website" />
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%23f1c967'/%3E%3Cpath d='M35 9 18 35h12l-2 20 18-28H34l1-18Z' fill='%230b3333'/%3E%3C/svg%3E" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400;1,9..144,500&family=Manrope:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <title>Micro Mundo de la Energía · Sistema Eléctrico Nacional de Chile</title>
+  </head>
+  <body>
+    <svg class="icon-sprite" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
+      <symbol id="i-waves" viewBox="0 0 24 24">
+        <path d="M2.5 8.5c2.2 0 2.2-1.8 4.4-1.8s2.2 1.8 4.4 1.8 2.2-1.8 4.4-1.8 2.2 1.8 4.4 1.8M2.5 13c2.2 0 2.2-1.8 4.4-1.8s2.2 1.8 4.4 1.8 2.2-1.8 4.4-1.8 2.2 1.8 4.4 1.8M2.5 17.5c2.2 0 2.2-1.8 4.4-1.8s2.2 1.8 4.4 1.8 2.2-1.8 4.4-1.8 2.2 1.8 4.4 1.8" />
+      </symbol>
+      <symbol id="i-sun" viewBox="0 0 24 24">
+        <circle cx="12" cy="12" r="3.6" />
+        <path d="M12 2.4v2M12 19.6v2M21.6 12h-2M4.4 12h-2M18.8 5.2l-1.4 1.4M6.6 17.4l-1.4 1.4M18.8 18.8l-1.4-1.4M6.6 6.6 5.2 5.2" />
+      </symbol>
+      <symbol id="i-mountain" viewBox="0 0 24 24">
+        <path d="m2.8 19 6.1-11 3.5 6.1 2-3.3 6.8 8.2H2.8Z" />
+        <path d="m7.1 12 1.8 1.3 1.7-1.2M11.5 15.7l.9-.8.9.9" />
+      </symbol>
+      <symbol id="i-steam" viewBox="0 0 24 24">
+        <path d="M7.2 21c2.1 0 2.1-2.1 4.2-2.1s2.1 2.1 4.2 2.1 2.1-2.1 4.2-2.1M8 15.5c0-2.1 2.6-2.8 2.6-4.9 0-1.1-.6-1.7-.6-2.8 0-.8.4-1.5 1.2-2 .8.5 1.2 1.2 1.2 2 0 1.1-.6 1.7-.6 2.8 0 2.1 2.6 2.8 2.6 4.9" />
+      </symbol>
+      <symbol id="i-wind" viewBox="0 0 24 24">
+        <path d="M3 8h10.2a2.2 2.2 0 1 0-2.1-2.8M3 12h15a2.4 2.4 0 1 1-2.3 3.1M3 16h7.8a2 2 0 1 1-1.9 2.7" />
+      </symbol>
+      <symbol id="i-bolt" viewBox="0 0 24 24">
+        <path d="m13.2 2.8-8.4 11h6.1l-.9 7.4 8.2-11.3h-5.7l.7-7.1Z" />
+      </symbol>
+      <symbol id="i-city" viewBox="0 0 24 24">
+        <path d="M3 21V8h6v13M9 21V3h7v18M16 21v-8h5v8M3 21h18M5.7 11h.1M5.7 14h.1M5.7 17h.1M11.7 6h.1M11.7 9h.1M11.7 12h.1M11.7 15h.1M18.5 16h.1M18.5 18h.1" />
+      </symbol>
+      <symbol id="i-grid" viewBox="0 0 24 24">
+        <path d="M4 4h16v16H4zM4 9.3h16M4 14.6h16M9.3 4v16M14.6 4v16" />
+      </symbol>
+      <symbol id="i-spark" viewBox="0 0 24 24">
+        <path d="M12 2.5c.7 5.9 3.6 8.8 9.5 9.5-5.9.7-8.8 3.6-9.5 9.5-.7-5.9-3.6-8.8-9.5-9.5C8.4 11.3 11.3 8.4 12 2.5Z" />
+      </symbol>
+      <symbol id="i-battery" viewBox="0 0 24 24">
+        <path d="M5 7.5h12.5a1.5 1.5 0 0 1 1.5 1.5v6a1.5 1.5 0 0 1-1.5 1.5H5A1.5 1.5 0 0 1 3.5 15V9A1.5 1.5 0 0 1 5 7.5ZM21 10v4M7 10.5v3M10 10.5v3" />
+      </symbol>
+      <symbol id="i-compass" viewBox="0 0 24 24">
+        <circle cx="12" cy="12" r="8.5" />
+        <path d="m14.8 9.2-1.6 4-4 1.6 1.6-4 4-1.6Z" />
+      </symbol>
+      <symbol id="i-pin" viewBox="0 0 24 24">
+        <path d="M19 10c0 5.2-7 11-7 11s-7-5.8-7-11a7 7 0 1 1 14 0Z" />
+        <circle cx="12" cy="10" r="2.4" />
+      </symbol>
+      <symbol id="i-close" viewBox="0 0 24 24">
+        <path d="m6 6 12 12M18 6 6 18" />
+      </symbol>
+      <symbol id="i-arrow" viewBox="0 0 24 24">
+        <path d="M4 12h15M13 6l6 6-6 6" />
+      </symbol>
+      <symbol id="i-chevron-left" viewBox="0 0 24 24">
+        <path d="m14.5 5-7 7 7 7" />
+      </symbol>
+      <symbol id="i-chevron-right" viewBox="0 0 24 24">
+        <path d="m9.5 5 7 7-7 7" />
+      </symbol>
+      <symbol id="i-moon" viewBox="0 0 24 24">
+        <path d="M20 15.6A8.6 8.6 0 0 1 8.4 4a8.7 8.7 0 1 0 11.6 11.6Z" />
+      </symbol>
+      <symbol id="i-day" viewBox="0 0 24 24">
+        <circle cx="12" cy="12" r="4" />
+        <path d="M12 1.8v2M12 20.2v2M22.2 12h-2M3.8 12h-2M19.2 4.8l-1.4 1.4M6.2 17.8l-1.4 1.4M19.2 19.2l-1.4-1.4M6.2 6.2 4.8 4.8" />
+      </symbol>
+      <symbol id="i-pause" viewBox="0 0 24 24">
+        <path d="M8 5v14M16 5v14" />
+      </symbol>
+      <symbol id="i-play" viewBox="0 0 24 24">
+        <path d="m8 4.5 11 7.5-11 7.5v-15Z" />
+      </symbol>
+      <symbol id="i-plus" viewBox="0 0 24 24">
+        <path d="M12 4v16M4 12h16" />
+      </symbol>
+      <symbol id="i-minus" viewBox="0 0 24 24">
+        <path d="M4 12h16" />
+      </symbol>
+      <symbol id="i-reset" viewBox="0 0 24 24">
+        <path d="M4.5 5.5v5h5M4.9 10.2a8 8 0 1 1 .5 5.4" />
+      </symbol>
+      <symbol id="i-info" viewBox="0 0 24 24">
+        <circle cx="12" cy="12" r="8.5" />
+        <path d="M12 10.8v5.3M12 7.5h.01" />
+      </symbol>
+      <symbol id="i-layers" viewBox="0 0 24 24">
+        <path d="m12 3 9 5-9 5-9-5 9-5ZM3.5 12.2l8.5 4.7 8.5-4.7M3.5 16.2l8.5 4.7 8.5-4.7" />
+      </symbol>
+      <symbol id="i-check" viewBox="0 0 24 24">
+        <path d="m5 12.5 4.5 4.5L19 6.5" />
+      </symbol>
+      <symbol id="i-leaf" viewBox="0 0 24 24">
+        <path d="M20.5 3.5C12 3 5.5 6.5 5.5 12.2c0 3 2.2 5.2 5.1 5.2 5.8 0 9.2-6.4 9.9-13.9ZM3 21c2.5-5.2 5.7-8.5 10.3-11.3" />
+      </symbol>
+      <symbol id="i-mouse" viewBox="0 0 24 24">
+        <rect x="6.5" y="2.5" width="11" height="19" rx="5.5" />
+        <path d="M12 7v3" />
+      </symbol>
+    </svg>
+
+    <main class="app" id="app" data-mode="overview">
+      <div class="atmosphere" aria-hidden="true">
+        <div class="atmosphere__sun"></div>
+        <div class="atmosphere__contours"></div>
+        <div class="atmosphere__grain"></div>
+        <div class="stars" aria-hidden="true"></div>
+      </div>
+
+      <div class="world-shell">
+        <div class="world" id="world" aria-label="Maqueta 3D interactiva del Sistema Eléctrico Nacional de Chile"></div>
+        <div class="world-vignette" aria-hidden="true"></div>
+      </div>
+
+      <header class="topbar">
+        <a class="brand" href="/" aria-label="Micro Mundo de la Energía, inicio">
+          <span class="brand__mark" aria-hidden="true">
+            <svg viewBox="0 0 40 40" role="img">
+              <path d="M22.8 5.2 11.4 21.9h7.8l-.6 12.9 11.8-17.5h-8.2l.6-12.1Z" fill="currentColor" />
+              <circle cx="30.4" cy="9.6" r="2.4" fill="currentColor" opacity=".6" />
+            </svg>
+          </span>
+          <span class="brand__text">
+            <span class="brand__name">Micro Mundo</span>
+            <span class="brand__sub">de la energía</span>
+          </span>
+        </a>
+
+        <div class="topbar__context" aria-label="Contexto de la maqueta">
+          <span class="live-pill"><span class="live-pill__dot"></span> Maqueta viva</span>
+          <span class="topbar__divider" aria-hidden="true"></span>
+          <span class="topbar__place">Sistema Eléctrico Nacional · Chile</span>
+        </div>
+
+        <div class="topbar__actions">
+          <button class="control-pill" id="theme-toggle" type="button" aria-label="Activar modo noche" aria-pressed="false">
+            <span class="control-pill__icon">
+              <svg class="icon icon--moon"><use href="#i-moon"></use></svg>
+              <svg class="icon icon--day"><use href="#i-day"></use></svg>
+            </span>
+            <span class="control-pill__label" data-theme-label>Modo noche</span>
+          </button>
+          <button class="control-pill control-pill--accent" id="tour-start" type="button" aria-label="Iniciar recorrido guiado">
+            <svg class="icon"><use href="#i-compass"></use></svg>
+            <span class="control-pill__label">Recorrido guiado</span>
+          </button>
+        </div>
+      </header>
+
+      <aside class="zone-panel" aria-label="Explora por zonas">
+        <div class="zone-panel__heading">
+          <span class="eyebrow"><span class="eyebrow__line"></span>Explora el territorio</span>
+          <h1>Un Chile<br /><em>en miniatura.</em></h1>
+          <p>
+            Doce instalaciones, cinco paisajes y una misma red que conecta el país de punta a punta.
+          </p>
+        </div>
+
+        <div class="zone-list" role="group" aria-label="Filtrar instalaciones por zona">
+          <button class="zone-button is-active" type="button" data-zone="all" aria-pressed="true">
+            <span class="zone-button__icon" style="--zone-color: #f1c967">
+              <svg class="icon"><use href="#i-layers"></use></svg>
+            </span>
+            <span class="zone-button__body">
+              <span class="zone-button__name">
+                <span class="zone-name--long">Vista general</span>
+                <span class="zone-name--short">General</span>
+              </span>
+              <span class="zone-button__eyebrow">Todo el territorio</span>
+            </span>
+            <span class="zone-button__count">12</span>
+          </button>
+
+          {zones.map((zone) => (
+            <button
+              class="zone-button"
+              type="button"
+              data-zone={zone.id}
+              aria-pressed="false"
+              style={`--zone-color: ${zone.color}`}
+            >
+              <span class="zone-button__icon">
+                <svg class="icon"><use href={`#i-${zone.icon}`}></use></svg>
+              </span>
+              <span class="zone-button__body">
+                <span class="zone-button__name">
+                  <span class="zone-name--long">{zone.name}</span>
+                  <span class="zone-name--short">{zone.shortName}</span>
+                </span>
+                <span class="zone-button__eyebrow">{zone.eyebrow}</span>
+              </span>
+              <span class="zone-button__count">{zoneSiteCount(zone.id)}</span>
+            </button>
+          ))}
+        </div>
+
+        <div class="zone-panel__hint">
+          <span class="hint-icon"><svg class="icon"><use href="#i-mouse"></use></svg></span>
+          <p><strong>Haz clic en el mapa</strong> para descubrir cada instalación.</p>
+          <span class="hint-scroll">Rueda o pinza para acercarte</span>
+        </div>
+      </aside>
+
+      <aside class="detail-panel" id="detail-panel" data-mode="overview" aria-live="polite">
+        <section class="detail-mode detail-overview" data-detail-mode="overview">
+          <div class="panel-topline">
+            <span class="eyebrow eyebrow--dark"><span class="eyebrow__line"></span>El país conectado</span>
+            <span class="panel-topline__badge">
+              <svg class="icon"><use href="#i-bolt"></use></svg>
+              SEN
+            </span>
+          </div>
+          <h2>La energía<br />recorre <em>Chile.</em></h2>
+          <p class="overview-copy">
+            Desde el sol de Atacama hasta la fuerza del mar, un sistema integra la electricidad de todo el país. Toca sus paisajes y descubre cómo llega a tu vida.
+          </p>
+
+          <div class="overview-stats">
+            {overviewStats.map((stat) => (
+              <div class="overview-stat">
+                <strong>{stat.value}</strong>
+                <span>{stat.label}</span>
+              </div>
+            ))}
+          </div>
+
+          <div class="overview-fact">
+            <span class="overview-fact__icon"><svg class="icon"><use href="#i-spark"></use></svg></span>
+            <p>
+              <strong>Una red, muchos paisajes.</strong>
+              La electricidad recorre más de 3.100 km para conectar generación, ciudades e industrias.
+            </p>
+          </div>
+
+          <button class="primary-button" id="overview-tour" type="button">
+            Comenzar recorrido
+            <svg class="icon"><use href="#i-arrow"></use></svg>
+          </button>
+
+          <div class="overview-footer">
+            <span><svg class="icon"><use href="#i-layers"></use></svg> 12 instalaciones</span>
+            <span><svg class="icon"><use href="#i-compass"></use></svg> Vista 45°</span>
+            <span title="Cifras y potencias con fines educativos"><svg class="icon"><use href="#i-info"></use></svg> Cifras referenciales</span>
+          </div>
+        </section>
+
+        <section class="detail-mode detail-zone" data-detail-mode="zone" hidden></section>
+        <section class="detail-mode detail-site" data-detail-mode="site" hidden></section>
+      </aside>
+
+      <div class="map-controls" aria-label="Controles de cámara">
+        <button class="map-control" id="zoom-in" type="button" aria-label="Acercar cámara">
+          <svg class="icon"><use href="#i-plus"></use></svg>
+        </button>
+        <button class="map-control" id="zoom-out" type="button" aria-label="Alejar cámara">
+          <svg class="icon"><use href="#i-minus"></use></svg>
+        </button>
+        <span class="map-controls__rule" aria-hidden="true"></span>
+        <button class="map-control" id="reset-view" type="button" aria-label="Volver a la vista general">
+          <svg class="icon"><use href="#i-reset"></use></svg>
+        </button>
+      </div>
+
+      <div class="map-note" aria-hidden="true">
+        <span class="map-note__line"></span>
+        <span>Maqueta interactiva · Chile continental</span>
+      </div>
+
+      <div class="map-tip" id="map-tip">
+        <span class="map-tip__pulse"></span>
+        Toca un punto brillante para explorar
+      </div>
+
+      <section class="mobile-intro" id="mobile-intro" aria-label="Bienvenida a la maqueta">
+        <div class="mobile-intro__copy">
+          <span class="mobile-intro__eyebrow">
+            <span class="mobile-intro__dot"></span>
+            Maqueta viva · SEN
+          </span>
+          <h2>Un Chile conectado<br />por la <em>energía.</em></h2>
+          <p>12 instalaciones para descubrir. Toca un punto y explora.</p>
+        </div>
+        <button class="mobile-intro__cta" id="mobile-tour" type="button">
+          Recorrido guiado
+          <svg class="icon"><use href="#i-arrow"></use></svg>
+        </button>
+      </section>
+
+      <section class="energy-chain" id="energy-chain" aria-label="Cadena de la energía">
+        <div class="energy-chain__header">
+          <span class="eyebrow"><span class="eyebrow__line"></span>Cómo viaja la energía</span>
+          <button class="motion-toggle" id="motion-toggle" type="button" aria-label="Pausar animaciones" aria-pressed="false">
+            <span class="motion-toggle__icon">
+              <svg class="icon icon--pause"><use href="#i-pause"></use></svg>
+              <svg class="icon icon--play"><use href="#i-play"></use></svg>
+            </span>
+            <span class="motion-toggle__label">En vivo</span>
+          </button>
+        </div>
+        <div class="chain-steps">
+          {chain.map((step, index) => (
+            <>
+              <div class="chain-step">
+                <span class="chain-step__number">0{index + 1}</span>
+                <span class="chain-step__icon">
+                  <svg class="icon"><use href={`#i-${step.icon}`}></use></svg>
+                </span>
+                <span class="chain-step__body">
+                  <strong>{step.stage}</strong>
+                  <span>{step.label}</span>
+                </span>
+              </div>
+              {index < chain.length - 1 && (
+                <span class="chain-link" aria-hidden="true">
+                  <span class="chain-link__pulse"></span>
+                </span>
+              )}
+            </>
+          ))}
+        </div>
+      </section>
+
+      <section class="tour-dock" id="tour-dock" aria-live="polite" hidden>
+        <div class="tour-dock__top">
+          <span class="eyebrow"><span class="eyebrow__line"></span>Recorrido guiado</span>
+          <div class="tour-dock__tools">
+            <span class="tour-dock__site" data-tour-site></span>
+            <span class="tour-dock__count" data-tour-count>01 / 06</span>
+            <button class="icon-button icon-button--dark" id="tour-close" type="button" aria-label="Cerrar recorrido">
+              <svg class="icon"><use href="#i-close"></use></svg>
+            </button>
+          </div>
+        </div>
+        <div class="tour-dock__content">
+          <h3 data-tour-title>El viaje comienza en el mar</h3>
+          <p data-tour-copy></p>
+        </div>
+        <div class="tour-dock__progress" data-tour-progress aria-hidden="true"></div>
+        <div class="tour-dock__actions">
+          <button class="secondary-button" data-tour-prev type="button">
+            <svg class="icon"><use href="#i-chevron-left"></use></svg>
+            Anterior
+          </button>
+          <button class="primary-button primary-button--compact" data-tour-next type="button">
+            Siguiente
+            <svg class="icon"><use href="#i-chevron-right"></use></svg>
+          </button>
+        </div>
+      </section>
+
+      <div class="loader" id="loader">
+        <div class="loader__glow" aria-hidden="true"></div>
+        <div class="loader__content">
+          <div class="loader__mark" aria-hidden="true">
+            <span class="loader__orbit"></span>
+            <span class="loader__core">
+              <svg viewBox="0 0 40 40">
+                <path d="M22.8 5.2 11.4 21.9h7.8l-.6 12.9 11.8-17.5h-8.2l.6-12.1Z" fill="currentColor" />
+              </svg>
+            </span>
+          </div>
+          <p class="loader__kicker">Sistema Eléctrico Nacional · Chile</p>
+          <h2 class="loader__title">Micro Mundo<br /><em>de la Energía</em></h2>
+          <p class="loader__status">Construyendo el territorio…</p>
+          <div class="loader__track" aria-hidden="true"><span></span></div>
+        </div>
+      </div>
+
+      <div class="webgl-fallback" id="webgl-fallback" hidden>
+        <h2>Tu navegador no pudo iniciar WebGL</h2>
+        <p>Prueba en un navegador actualizado o activa la aceleración por hardware para explorar la maqueta 3D.</p>
+      </div>
+    </main>
+
+    <script>
+      import '../scripts/app';
+    </script>
+  </body>
+</html>

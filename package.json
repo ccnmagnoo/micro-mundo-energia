@@ -1,0 +1,21 @@
+{
+  "name": "micro-mundo-energia",
+  "version": "1.0.0",
+  "description": "Maqueta isométrica interactiva del Sistema Eléctrico Nacional de Chile",
+  "type": "module",
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "check": "astro check"
+  },
+  "dependencies": {
+    "astro": "^7.4.2",
+    "three": "^0.186.1"
+  },
+  "devDependencies": {
+    "@astrojs/check": "^0.9.12",
+    "@types/three": "^0.186.0",
+    "typescript": "^6.0.3"
+  }
+}
