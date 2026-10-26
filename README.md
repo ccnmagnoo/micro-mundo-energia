@@ -1,6 +1,7 @@
 # Micro Mundo de la Energía
 
 Maqueta digital interactiva del Sistema Eléctrico Nacional de Chile, construida con **Astro + Three.js**. El escenario representa en una vista isométrica la cadena eléctrica completa: generación marina, solar, hidráulica, geotérmica y eólica; transmisión de alta tensión; y consumo urbano.
+![tableo](./captures/iso_board.png)
 
 ## Ejecutar
 
