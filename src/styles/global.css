@@ -49,7 +49,7 @@ body {
   background: var(--bg-deep);
   color: var(--cream);
   font-family: var(--font-sans);
-  font-size: 14px;
+  font-size: 12px;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
 }
@@ -455,7 +455,7 @@ strong {
   align-items: center;
   gap: 8px;
   color: rgba(246, 240, 227, 0.55);
-  font-size: 8px;
+  font-size: 10px;
   font-weight: 700;
   line-height: 1.2;
   letter-spacing: 0.17em;
@@ -497,7 +497,7 @@ strong {
 }
 
 .icon-button .icon {
-  font-size: 14px;
+  font-size: 16px;
 }
 
 .icon-button--dark {
@@ -522,7 +522,7 @@ strong {
   background: var(--ink);
   border: 1px solid rgba(9, 36, 34, 0.2);
   border-radius: 999px;
-  font-size: 10.5px;
+  font-size: 12px;
   font-weight: 700;
   letter-spacing: 0.05em;
   box-shadow: 0 9px 20px rgba(13, 49, 45, 0.13);
@@ -640,8 +640,8 @@ strong {
 .zone-panel__heading p {
   max-width: 223px;
   color: rgba(246, 240, 227, 0.52);
-  font-size: 11.2px;
-  line-height: 1.6;
+  font-size: .7rem;
+  line-height: 1.5;
 }
 
 .zone-list {
@@ -692,7 +692,7 @@ strong {
 }
 
 .zone-button__icon .icon {
-  font-size: 16px;
+  font-size: 1rem;
 }
 
 .zone-button__body {
@@ -705,7 +705,7 @@ strong {
 .zone-button__name {
   display: block;
   overflow: hidden;
-  font-size: 11.2px;
+  font-size: .8rem;
   font-weight: 600;
   line-height: 1.3;
   letter-spacing: -0.01em;
@@ -720,7 +720,7 @@ strong {
 .zone-button__eyebrow {
   overflow: hidden;
   color: rgba(246, 240, 227, 0.38);
-  font-size: 8px;
+  font-size: .7rem;
   font-weight: 500;
   line-height: 1.3;
   letter-spacing: 0.055em;
@@ -772,7 +772,7 @@ strong {
   padding: 13px 6px 0;
   color: rgba(246, 240, 227, 0.36);
   border-top: 1px solid rgba(246, 240, 227, 0.09);
-  font-size: 8.5px;
+  font-size: .7rem;
   line-height: 1.45;
 }
 
@@ -797,10 +797,16 @@ strong {
 .hint-scroll {
   grid-column: 2;
   color: var(--gold);
-  font-size: 7px;
+  font-size: .4rem;
   font-weight: 700;
   letter-spacing: 0.12em;
   text-transform: uppercase;
+}
+.hint-scroll.mailto{
+  font-size: .5rem;
+  a{
+    text-decoration: none;
+  }
 }
 
 /* --------------------------------------------------------------------------
