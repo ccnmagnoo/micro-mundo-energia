@@ -95,6 +95,10 @@ export class EnergyWorld {
   private pinchStartDistance = 0;
   private pinchStartZoom = 1;
   private suppressClick = false;
+  private isDragging = false;
+  private dragStartTarget = new THREE.Vector3();
+  private dragStartWorld = new THREE.Vector3();
+  private dragThreshold = 6;
   private disposed = false;
   private readyCalled = false;
 
@@ -205,6 +209,8 @@ export class EnergyWorld {
     this.renderer.domElement.addEventListener('pointercancel', this.handlePointerUp);
     this.renderer.domElement.addEventListener('pointerleave', this.handlePointerLeave);
     this.renderer.domElement.addEventListener('wheel', this.handleWheel, { passive: false });
+    this.renderer.domElement.addEventListener('dblclick', this.handleDoubleClick);
+    document.addEventListener('keydown', this.handleKeyDown);
     document.addEventListener('visibilitychange', this.handleVisibility);
 
     this.animate();
@@ -703,13 +709,21 @@ export class EnergyWorld {
   private handlePointerDown = (event: PointerEvent) => {
     if (event.pointerType === 'mouse' && event.button !== 0) return;
     const rect = this.renderer.domElement.getBoundingClientRect();
+    const x = event.clientX - rect.left;
+    const y = event.clientY - rect.top;
     this.pointers.set(event.pointerId, {
-      x: event.clientX - rect.left,
-      y: event.clientY - rect.top,
-      startX: event.clientX - rect.left,
-      startY: event.clientY - rect.top,
+      x,
+      y,
+      startX: x,
+      startY: y,
     });
     this.renderer.domElement.setPointerCapture?.(event.pointerId);
+
+    if (this.pointers.size === 1 && event.pointerType === 'mouse') {
+      this.isDragging = false;
+      this.dragStartTarget.copy(this.cameraTargetGoal);
+      this.dragStartWorld.copy(this.screenToWorld(x, y, this.dragStartTarget.y));
+    }
 
     if (this.pointers.size === 2) {
       const [a, b] = [...this.pointers.values()];
@@ -736,12 +750,31 @@ export class EnergyWorld {
       if (this.pinchStartDistance > 0) {
         this.zoomGoal = THREE.MathUtils.clamp(
           this.pinchStartZoom * (distance / this.pinchStartDistance),
-          0.78,
-          2.35,
+          0.5,
+          4.0,
         );
       }
       this.hideTooltip();
       return;
+    }
+
+    if (record && this.pointers.size === 1 && event.pointerType === 'mouse') {
+      const dx = x - record.startX;
+      const dy = y - record.startY;
+      if (!this.isDragging && Math.hypot(dx, dy) > this.dragThreshold) {
+        this.isDragging = true;
+        this.suppressClick = true;
+        this.hideTooltip();
+      }
+      if (this.isDragging) {
+        const currentWorld = this.screenToWorld(x, y, this.dragStartTarget.y);
+        const delta = this.dragStartWorld.clone().sub(currentWorld);
+        this.cameraTargetGoal.copy(this.dragStartTarget).add(delta);
+        this.cameraTargetGoal.x = THREE.MathUtils.clamp(this.cameraTargetGoal.x, -16, 16);
+        this.cameraTargetGoal.z = THREE.MathUtils.clamp(this.cameraTargetGoal.z, -22, 22);
+        this.renderer.domElement.style.cursor = 'grabbing';
+        return;
+      }
     }
 
     this.pointer.x = (x / rect.width) * 2 - 1;
@@ -760,13 +793,16 @@ export class EnergyWorld {
     }
 
     if (this.pointers.size === 0) {
-      if (!wasPinching && !this.suppressClick) {
+      const wasDragging = this.isDragging;
+      this.isDragging = false;
+      this.renderer.domElement.style.cursor = this.hoveredId ? 'pointer' : 'default';
+      if (!wasPinching && !wasDragging && !this.suppressClick) {
         const rect = this.renderer.domElement.getBoundingClientRect();
         const x = event.clientX - rect.left;
         const y = event.clientY - rect.top;
         this.handleSceneClick(x, y);
       }
-      if (wasPinching) {
+      if (wasPinching || wasDragging) {
         window.setTimeout(() => {
           this.suppressClick = false;
         }, 80);
@@ -781,16 +817,64 @@ export class EnergyWorld {
     this.setHovered(null);
     this.pointers.clear();
     this.isPinching = false;
+    this.isDragging = false;
+    this.renderer.domElement.style.cursor = 'default';
   };
 
   private handleWheel = (event: WheelEvent) => {
     event.preventDefault();
     this.zoomGoal = THREE.MathUtils.clamp(
-      this.zoomGoal * Math.exp(-event.deltaY * 0.0012),
-      0.78,
-      2.35,
+      this.zoomGoal * Math.exp(-event.deltaY * 0.0014),
+      0.5,
+      4.0,
     );
   };
+
+  private handleDoubleClick = (event: MouseEvent) => {
+    const rect = this.renderer.domElement.getBoundingClientRect();
+    const x = event.clientX - rect.left;
+    const y = event.clientY - rect.top;
+    const site = this.siteAtPointer(x, y);
+    if (site) {
+      this.zoomGoal = THREE.MathUtils.clamp(this.zoomGoal * 1.35, 0.5, 4.0);
+      this.focusSite(site);
+    } else {
+      this.zoomGoal = THREE.MathUtils.clamp(this.zoomGoal * 1.25, 0.5, 4.0);
+    }
+  };
+
+  private handleKeyDown = (event: KeyboardEvent) => {
+    if (event.target && (event.target as HTMLElement).tagName === 'INPUT') return;
+    switch (event.key) {
+      case '+':
+      case '=':
+        this.zoomBy(1.18);
+        event.preventDefault();
+        break;
+      case '-':
+      case '_':
+        this.zoomBy(0.85);
+        event.preventDefault();
+        break;
+      case '0':
+        this.resetView();
+        event.preventDefault();
+        break;
+      default:
+        break;
+    }
+  };
+
+  private screenToWorld(x: number, y: number, planeY: number) {
+    const rect = this.renderer.domElement.getBoundingClientRect();
+    this.pointer.set((x / rect.width) * 2 - 1, -(y / rect.height) * 2 + 1);
+    this.raycaster.setFromCamera(this.pointer, this.camera);
+    const plane = new THREE.Plane(new THREE.Vector3(0, 1, 0), -planeY);
+    const hit = new THREE.Vector3();
+    const result = this.raycaster.ray.intersectPlane(plane, hit);
+    if (result) return hit;
+    return new THREE.Vector3(this.cameraTargetGoal.x, planeY, this.cameraTargetGoal.z);
+  }
 
   private handleVisibility = () => {
     if (!document.hidden) {
@@ -840,7 +924,7 @@ export class EnergyWorld {
 
     if (!id) {
       this.hoverRing.visible = false;
-      this.renderer.domElement.style.cursor = 'default';
+      if (!this.isDragging) this.renderer.domElement.style.cursor = 'grab';
       this.callbacks.onHover?.(null);
       return;
     }
@@ -1082,7 +1166,7 @@ export class EnergyWorld {
   }
 
   zoomBy(factor: number) {
-    this.zoomGoal = THREE.MathUtils.clamp(this.zoomGoal * factor, 0.78, 2.35);
+    this.zoomGoal = THREE.MathUtils.clamp(this.zoomGoal * factor, 0.5, 4.0);
   }
 
   setPaused(paused: boolean) {
@@ -1112,6 +1196,8 @@ export class EnergyWorld {
     this.renderer.domElement.removeEventListener('pointercancel', this.handlePointerUp);
     this.renderer.domElement.removeEventListener('pointerleave', this.handlePointerLeave);
     this.renderer.domElement.removeEventListener('wheel', this.handleWheel);
+    this.renderer.domElement.removeEventListener('dblclick', this.handleDoubleClick);
+    document.removeEventListener('keydown', this.handleKeyDown);
     document.removeEventListener('visibilitychange', this.handleVisibility);
     this.markerLayer.remove();
     this.tooltip.remove();
