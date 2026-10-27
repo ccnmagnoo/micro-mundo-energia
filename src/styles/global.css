@@ -1898,7 +1898,7 @@ strong {
   background: rgba(246, 240, 227, 0.045);
   border: 1px solid rgba(246, 240, 227, 0.09);
   border-radius: 999px;
-  font-size: 7px;
+  font-size: .7rem;
   font-weight: 600;
   letter-spacing: 0.04em;
   transition: background 0.2s ease, color 0.2s ease;
@@ -1918,7 +1918,7 @@ strong {
 }
 
 .motion-toggle__icon .icon {
-  font-size: 9px;
+  font-size: .9rem;
 }
 
 .motion-toggle .icon--play {
@@ -1951,7 +1951,7 @@ strong {
   align-self: flex-start;
   margin-top: 3px;
   color: rgba(246, 240, 227, 0.28);
-  font-size: 5.5px;
+  font-size: .6rem;
   font-weight: 700;
   letter-spacing: 0.08em;
 }
@@ -1982,7 +1982,7 @@ strong {
 .chain-step__body strong {
   overflow: hidden;
   color: rgba(246, 240, 227, 0.84);
-  font-size: 8px;
+  font-size: .6rem;
   font-weight: 600;
   line-height: 1.25;
   text-overflow: ellipsis;
@@ -1992,7 +1992,7 @@ strong {
 .chain-step__body span {
   overflow: hidden;
   color: rgba(246, 240, 227, 0.34);
-  font-size: 6.5px;
+  font-size: .5rem;
   line-height: 1.3;
   text-overflow: ellipsis;
   white-space: nowrap;
