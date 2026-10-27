@@ -7,7 +7,9 @@
     "dev": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
-    "check": "astro check"
+    "check": "astro check",
+    "deploy": "firebase deploy --only hosting:micromundoenergia",
+    "login":"firebase login --reauth"
   },
   "dependencies": {
     "astro": "^7.4.2",

@@ -1366,7 +1366,7 @@ strong {
   background: rgba(255, 255, 255, 0.28);
   border: 1px solid rgba(17, 58, 56, 0.08);
   border-radius: 999px;
-  font-size: 7.3px;
+  font-size: .65gitrem;
   font-weight: 600;
   letter-spacing: 0.02em;
 }
@@ -1385,7 +1385,7 @@ strong {
   gap: 4px;
   flex: 1;
   color: rgba(17, 58, 56, 0.3);
-  font-size: 6.2px;
+  font-size: .5rem;
   font-weight: 700;
   letter-spacing: 0.03em;
   text-align: center;

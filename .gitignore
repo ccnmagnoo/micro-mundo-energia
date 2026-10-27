@@ -7,3 +7,4 @@ dist/
 data/empresas/.trash/
 *.log
 .DS_Store
+.firebase
